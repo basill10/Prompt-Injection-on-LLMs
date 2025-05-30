@@ -1,11 +1,87 @@
-I was unable to access the repo for llama-2-7b but what I made out of the attached repo is basically it implements the methods described in the paper "Automatic and Universal Prompt Injection Attacks against Large Language Models". The goal is to automatically generate universal prompt injection attacks and manipulate LLMs, regardless of the specific defense mechanisms in place.
+# Prompt Injection on Large Language Models (LLMs)
 
-Instead of manually crafting attack prompts, attack uses a gradient-based optimization approach to generate adversarial suffixes (attack prompts) that, when appended to user instructions, cause the LLM to output attacker-controlled content.
+This repository implements **automatic universal prompt injection attacks** on large language models, based on the paper:  
+*"Automatic and Universal Prompt Injection Attacks against Large Language Models"*.  
 
-The first phase is the Attack Generation (universal_prompt_injection.py). In this phase, the script first initializes the attack environment, loads a target language model (Llama2 etc.) and the corresponding tokenizer. It also loads a small set of harmful training samples, which include instructions, inputs, and the attacker's desired outputs. An adversarial suffix is initialized.
-Next, the script enters an optimization loop. Over a number of steps, it appends the current adversarial suffix to each training instruction and computes the gradient of the loss with respect to the suffix tokens. This is done using the language model as a differentiable function. The gradients across the batch are aggregated, momentum is applied, and the suffix tokens are updated to maximize the likelihood of the attacker's target output. Utility functions like token_gradients, sample_control, and get_filtered_cands are present.
-The goal is to basically produce a universal adversarial suffix that works across many instructions and tasks—not just the ones used in training.
-Next its Attack Evaluation (get_responses_universal.py). The purpose here is to test the effectiveness of the generated adversarial suffix on a wide range of tasks, such as summarization, sentiment analysis, and hate detection etc the relevant datasets are present. The script loads the optimized suffix and a set of evaluation instructions. For each instruction, it appends the suffix and queries the language model. The script then checks whether the model’s output contains the attacker's target content (e.g., a specific URL or phrase). This is repeated across different types of injection strategies, including static, semi-dynamic, dynamic, and refuse.
-finally its results Checking (check_answers.py). Here, the script reports the success rate across different tasks and models. It loads the results from the evaluation phase and, for each result, checks if the attack target appears in the language model’s output. It then computes and saves the success rate for each configuration.
+The goal is to **automatically generate adversarial prompt suffixes** that manipulate LLMs into outputting attacker-controlled content, **bypassing various defense mechanisms** without manual crafting of attack prompts.
 
-first tried gpt2 but since it not being an instruction tuned model, the results weren't satisfactory. T5 I found worked pretty well. Outputs of both attached.
+---
+
+## Overview
+
+Instead of manually designing attack prompts, this project uses a **gradient-based optimization approach** to generate **universal adversarial suffixes**. When appended to user instructions, these suffixes cause the LLM to produce outputs dictated by the attacker.
+
+The process consists of three main phases:
+
+### 1. Attack Generation (`universal_prompt_injection.py`)
+
+- Initializes the attack environment, loading a target LLM (e.g., LLaMA 2) and its tokenizer.
+- Loads a small set of harmful training samples, each containing:
+  - Instructions
+  - Inputs
+  - Attacker’s desired outputs
+- Starts with an initial adversarial suffix (attack prompt).
+- Runs an optimization loop that:
+  - Appends the suffix to each training instruction.
+  - Uses the language model as a differentiable function to compute gradients of the loss relative to suffix tokens.
+  - Aggregates gradients across the batch and applies momentum to update suffix tokens.
+- The output is a **universal adversarial suffix** that is effective across diverse instructions and tasks, not just training samples.
+- Utility functions involved include:
+  - `token_gradients`
+  - `sample_control`
+  - `get_filtered_cands`
+
+### 2. Attack Evaluation (`get_responses_universal.py`)
+
+- Loads the optimized adversarial suffix and a broad set of evaluation instructions covering multiple tasks:
+  - Summarization
+  - Sentiment Analysis
+  - Hate Speech Detection
+  - And more
+- Appends the suffix to each evaluation instruction and queries the target language model.
+- Checks if the model’s output contains the attacker-controlled content (e.g., a specific phrase or URL).
+- Evaluates different injection strategies:
+  - Static
+  - Semi-Dynamic
+  - Dynamic
+  - Refuse
+
+### 3. Results Checking (`check_answers.py`)
+
+- Loads evaluation results from the previous phase.
+- Checks whether the attack target appears in each model output.
+- Computes success rates per task and model configuration.
+- Saves detailed success metrics for analysis.
+
+---
+
+## How to Use
+
+1. **Generate Attack Suffix:**  
+   Run `universal_prompt_injection.py` to produce the universal adversarial suffix.
+
+2. **Evaluate Attack:**  
+   Use `get_responses_universal.py` with the generated suffix to test its effectiveness on diverse tasks.
+
+3. **Analyze Results:**  
+   Execute `check_answers.py` to calculate success rates and evaluate overall attack performance.
+
+---
+
+## Requirements
+
+- Python 3.x  
+- PyTorch  
+- Hugging Face Transformers  
+- Other dependencies (see `requirements.txt`)  
+
+---
+
+## References
+
+- Paper: [Automatic and Universal Prompt Injection Attacks against Large Language Models](https://arxiv.org/abs/2302.08472)  
+- Models: Google Flan T5, LLaMA 2, and others  
+
+---
+
+Feel free to contribute, report issues, or suggest improvements!
