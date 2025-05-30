@@ -79,7 +79,7 @@ The process consists of three main phases:
 
 ## References
 
-- Paper: [Automatic and Universal Prompt Injection Attacks against Large Language Models](https://arxiv.org/abs/2302.08472)  
+- Paper: [Automatic and Universal Prompt Injection Attacks against Large Language Models](https://arXiv:2403.04957)  
 - Models: Google Flan T5, LLaMA 2, and others  
 
 ---
